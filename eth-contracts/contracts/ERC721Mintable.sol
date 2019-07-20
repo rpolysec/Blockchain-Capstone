@@ -13,7 +13,7 @@ contract Ownable {
     /**
     * 1) create a private '_owner' variable of type address with a public getter function
     */
-    function getOwner() public returns(address){
+    function getOwner() public view returns(address){
         return _owner;
     }
 
@@ -33,7 +33,7 @@ contract Ownable {
         _;
     }
 
-    function isOwner(address sender) internal returns(bool){
+    function isOwner(address sender) internal view returns(bool){
         return sender == _owner;
     }
 
@@ -209,7 +209,7 @@ contract ERC721 is Pausable, ERC165 {
 
     function getApproved(uint256 tokenId) public view returns (address) {
         // TODO return token approval if it exists
-        require(_tokenApprovals[tokenId],'token approval does not exist');
+        require(_tokenApprovals[tokenId]!=address(0),'token approval does not exist');
         return _tokenApprovals[tokenId];
     }
 
@@ -299,8 +299,10 @@ contract ERC721 is Pausable, ERC165 {
         require(to!=address(0),'Address to send token to is not valid');
         
         // TODO: clear approval
+        _clearApproval(tokenId);
 
         // TODO: update token counts & transfer ownership of the token ID
+        _ownedTokensCount(to).increment();
 
         // TODO: emit correct event
         emit Transfer(from, to, tokenId);
@@ -509,8 +511,12 @@ contract ERC721Enumerable is ERC165, ERC721 {
 contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     
     // TODO: Create private vars for token _name, _symbol, and _baseTokenURI (string)
+    string private _name;
+    string private _symbol;
+    string private _baseTokenURI;
 
     // TODO: create private mapping of tokenId's to token uri's called '_tokenURIs'
+    mapping(uint256 => string[]) private _tokenURIs;
 
     bytes4 private constant _INTERFACE_ID_ERC721_METADATA = 0x5b5e139f;
     /*
@@ -523,11 +529,34 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
 
     constructor (string memory name, string memory symbol, string memory baseTokenURI) public {
         // TODO: set instance var values
+        _name = name;
+        _symbol = symbol;
+        _baseTokenURI = baseTokenURI;
 
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
     }
 
     // TODO: create external getter functions for name, symbol, and baseTokenURI
+    /**
+    * Getter function for _name
+    */
+    function getName() external view returns(string memory){
+        return _name;
+    }
+
+    /**
+    * Getter function for _symbol
+    */
+    function getSymbol() external view returns(string memory){
+        return _symbol;
+    }
+
+    /**
+    * Getter function for _baseTokenURI
+    */
+    function getBaseTokenURI() external view returns(string memory){
+        return _baseTokenURI;
+    }
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId), 'token id does not exist');
@@ -535,13 +564,20 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     }
 
 
-    // TODO: Create an internal function to set the tokenURI of a specified tokenId
-    // It should be the _baseTokenURI + the tokenId in string form
-    // TIP #1: use strConcat() from the imported oraclizeAPI lib to set the complete token URI
-    // TIP #2: you can also use uint2str() to convert a uint to a string
-        // see https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol for strConcat()
-    // require the token exists before setting
-
+    /**
+    *  TODO: Create an internal function to set the tokenURI of a specified tokenId
+    * It should be the _baseTokenURI + the tokenId in string form
+    * TIP #1: use strConcat() from the imported oraclizeAPI lib to set the complete token URI
+    * TIP #2: you can also use uint2str() to convert a uint to a string
+    *  see https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol for strConcat()
+    * require the token exists before setting
+    */
+    function setTokenURI(uint256 tokenId) internal {
+        require(_exists(tokenId), 'token id does not exist');
+        string memory tokenid_str = uint2str(tokenId);
+        string memory tokenURI_str = strConcat(_baseTokenURI,tokenid_str);
+        _tokenURIs[tokenId] = tokenURI_str;
+    }
 }
 
 //  TODO's: Create CustomERC721Token contract that inherits from the ERC721Metadata contract. You can name this contract as you please
