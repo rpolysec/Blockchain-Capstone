@@ -282,7 +282,7 @@ contract ERC721 is Pausable, ERC165 {
 
         // TODO mint tokenId to given address & increase token count of owner
         _mint(to, tokenId);
-        _ownedTokensCount[address].increcement();
+        _ownedTokensCount[to].increment();
 
         // TODO emit Transfer event
         emit Transfer(msg.sender, to, tokenId);
@@ -302,7 +302,7 @@ contract ERC721 is Pausable, ERC165 {
         _clearApproval(tokenId);
 
         // TODO: update token counts & transfer ownership of the token ID
-        _ownedTokensCount(to).increment();
+        _ownedTokensCount[to].increment();
 
         // TODO: emit correct event
         emit Transfer(from, to, tokenId);
@@ -516,7 +516,7 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     string private _baseTokenURI;
 
     // TODO: create private mapping of tokenId's to token uri's called '_tokenURIs'
-    mapping(uint256 => string[]) private _tokenURIs;
+    mapping(uint256 => string) private _tokenURIs;
 
     bytes4 private constant _INTERFACE_ID_ERC721_METADATA = 0x5b5e139f;
     /*
@@ -563,7 +563,6 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
         return _tokenURIs[tokenId];
     }
 
-
     /**
     *  TODO: Create an internal function to set the tokenURI of a specified tokenId
     * It should be the _baseTokenURI + the tokenId in string form
@@ -580,14 +579,29 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     }
 }
 
-//  TODO's: Create CustomERC721Token contract that inherits from the ERC721Metadata contract. You can name this contract as you please
-//  1) Pass in appropriate values for the inherited ERC721Metadata contract
-//      - make the base token uri: https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/
-//  2) create a public mint() that does the following:
-//      -can only be executed by the contract owner
-//      -takes in a 'to' address, tokenId, and tokenURI as parameters
-//      -returns a true boolean upon completion of the function
-//      -calls the superclass mint and setTokenURI functions
+/**
+* TODO's: Create CustomERC721Token contract that inherits from the ERC721Metadata contract. You can name this contract as you please
+*/
+contract CustomERC721Token is ERC721Metadata {
 
+    /**
+    * //  1) Pass in appropriate values for the inherited ERC721Metadata contract
+    * - make the base token uri: https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/
+    */
+    constructor (string memory name, string memory symbol)
+        ERC721Metadata(name,symbol,"https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/")
+        public {}
 
-
+        /**
+        * 2) create a public mint() that does the following:
+        * -can only be executed by the contract owner
+        * -takes in a 'to' address, tokenId, and tokenURI as parameters
+        * -returns a true boolean upon completion of the function
+        * -calls the superclass mint and setTokenURI functions
+        */
+        function mint(address to, uint tokenId) public onlyOwner returns(bool){
+            super._mint(to, tokenId);
+            super.setTokenURI(tokenId);
+            return true;
+        }
+}
