@@ -277,11 +277,11 @@ contract ERC721 is Pausable, ERC165 {
     function _mint(address to, uint256 tokenId) internal {
 
         // TODO revert if given tokenId already exists or given address is invalid
-        require(_exists(tokenId),'token id must exist to mint');
+        require(!_exists(tokenId),'token id already exists');
         require(to!=address(0),'address must be valid');
 
         // TODO mint tokenId to given address & increase token count of owner
-        _mint(to, tokenId);
+        _tokenOwner[tokenId] = to;
         _ownedTokensCount[to].increment();
 
         // TODO emit Transfer event
@@ -297,12 +297,13 @@ contract ERC721 is Pausable, ERC165 {
 
         // TODO: require token is being transfered to valid address
         require(to!=address(0),'Address to send token to is not valid');
-        
+
         // TODO: clear approval
         _clearApproval(tokenId);
 
         // TODO: update token counts & transfer ownership of the token ID
         _ownedTokensCount[to].increment();
+        _tokenOwner[tokenId] = to;
 
         // TODO: emit correct event
         emit Transfer(from, to, tokenId);
@@ -509,7 +510,6 @@ contract ERC721Enumerable is ERC165, ERC721 {
 }
 
 contract ERC721Metadata is ERC721Enumerable, usingOraclize {
-    
     // TODO: Create private vars for token _name, _symbol, and _baseTokenURI (string)
     string private _name;
     string private _symbol;
