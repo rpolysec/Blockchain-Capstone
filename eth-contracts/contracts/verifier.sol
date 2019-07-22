@@ -411,11 +411,11 @@ library Pairing {
         uint[2] Y;
     }
     /// @return the generator of G1
-    function P1() pure internal returns (G1Point memory) {
+    function P1() internal pure returns (G1Point memory) {
         return G1Point(1, 2);
     }
     /// @return the generator of G2
-    function P2() pure internal returns (G2Point memory) {
+    function P2() internal pure returns (G2Point memory) {
         return G2Point(
             [11559732032986387107991004021392285783925812861821192530917403151452391805634,
              10857046999023057135944570762232829481370756359578518086990519993285655852781],
@@ -424,7 +424,7 @@ library Pairing {
         );
     }
     /// @return the negation of p, i.e. p.addition(p.negate()) should be zero.
-    function negate(G1Point memory p) pure internal returns (G1Point memory) {
+    function negate(G1Point memory p) internal pure returns (G1Point memory) {
         // The prime q in the base field F_q for G1
         uint q = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
         if (p.X == 0 && p.Y == 0)
@@ -444,7 +444,7 @@ library Pairing {
             // Use "invalid" to make gas estimation work
             switch success case 0 { invalid() }
         }
-        require(success);
+        require(success, 'error');
     }
     /// @return the sum of two points of G2
     function addition(G2Point memory p1, G2Point memory p2) internal returns (G2Point memory r) {
@@ -463,14 +463,14 @@ library Pairing {
             // Use "invalid" to make gas estimation work
             switch success case 0 { invalid() }
         }
-        require (success);
+        require (success,'error');
     }
     /// @return the result of computing the pairing check
     /// e(p1[0], p2[0]) *  .... * e(p1[n], p2[n]) == 1
     /// For example pairing([P1(), P1().negate()], [P2(), P2()]) should
     /// return true.
     function pairing(G1Point[] memory p1, G2Point[] memory p2) internal returns (bool) {
-        require(p1.length == p2.length);
+        require(p1.length == p2.length, 'error');
         uint elements = p1.length;
         uint inputSize = elements * 6;
         uint[] memory input = new uint[](inputSize);
@@ -490,7 +490,7 @@ library Pairing {
             // Use "invalid" to make gas estimation work
             switch success case 0 { invalid() }
         }
-        require(success);
+        require(success,'failed');
         return out[0] != 0;
     }
     /// Convenience method for a pairing check for two pairs.
@@ -554,7 +554,7 @@ contract Verifier {
         Pairing.G2Point B;
         Pairing.G1Point C;
     }
-    function verifyingKey() pure internal returns (VerifyingKey memory vk) {
+    function verifyingKey() internal pure returns (VerifyingKey memory vk) {
         vk.a = Pairing.G1Point(uint256(0x0df6c35cc7aa02aaad18d54a44ef8ea0e4d416082b70ef7f0319c03dfc4a19b8), uint256(0x2631cbab35094bb57740e55547c0bfc54b0117d7b483cc2130bc58c5e6125b8a));
         vk.b = Pairing.G2Point([uint256(0x2790f8b2ba8c387fc8fea313319eb0efae18b9aad71d39684d11bf2cf98a97c5), uint256(0x2155f2af0c12cc91be991ed74598fcbee0d5bab51fbdddcc39f2c091b0c81d76)], [uint256(0x0119fc001bd8c6d4885b40eca39541a0a5b2e1f4af00799235170004938adb9c), uint256(0x22101dade0b1b27e77a4b5d04896205885d3fdc8c7e07a737c83066c4864d358)]);
         vk.gamma = Pairing.G2Point([uint256(0x29822a5b0a7dc566e37cc236bc030d798ce9b5f47f2981ee2a0893abad3d996b), uint256(0x01eb2dd34911d964d13501aa915abb1fcc94224f70f741dbf8333bc95edc10ad)], [uint256(0x2e3b05d351f438382b216895755ab2fbe82d81e3a5726b0f5e1681130d36051d), uint256(0x1a81d1a83c03f4f3dfbef1bb3b4a7cf02da0bbc1903d9e754274c46dad057aa0)]);
