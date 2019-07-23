@@ -540,21 +540,21 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
     /**
     * Getter function for _name
     */
-    function getName() external view returns(string memory){
+    function name() external view returns(string memory){
         return _name;
     }
 
     /**
     * Getter function for _symbol
     */
-    function getSymbol() external view returns(string memory){
+    function symbol() external view returns(string memory){
         return _symbol;
     }
 
     /**
     * Getter function for _baseTokenURI
     */
-    function getBaseTokenURI() external view returns(string memory){
+    function baseTokenURI() external view returns(string memory){
         return _baseTokenURI;
     }
 

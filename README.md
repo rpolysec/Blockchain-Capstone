@@ -2,6 +2,15 @@
 
 The capstone will build upon the knowledge you have gained in the course in order to build a decentralized housing product. 
 
+# Handin Details
+
+Contract Addresses
+
+Contract Abi's
+
+OpenSea MarketPlace Storefront links:
+https://rinkeby.opensea.io/storefront/sunrise-housing-udacity-capstone
+
 # Install
 
 Clone this repository and run the following commands:
