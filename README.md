@@ -34,11 +34,33 @@ The following packages are required, npm install should take care of retrieving 
 * "openzeppelin-solidity": "^2.2.0",
 * "solc": "^0.5.2",
 * "solc-js": "^0.5.2"
+* "web3": "^1.0.0-beta.55"
 
 For development and testing I used:
 
 * Ganache CLI v6.4.3 (ganache-core: 2.5.5)
 * Truffle v5.0.28 - a development framework for Ethereum
+
+## Contributing
+
+You don't need to contribute to me.  A passing grade will do.
+
+## Versioning
+
+This is the one and only version.
+
+## Authors
+
+* **Ryan Wegner**
+
+## License
+
+No license here.  Use this however you see fit.
+
+## Acknowledgments
+
+* Udacity for organizing this fine course.
+* Alvaro P. Udacity Mentor for organizing so much reference material.
 
 # Additional Guidance
 
@@ -47,7 +69,6 @@ https://github.com/udacity/Blockchain-Capstone
 
 An FAQ on the project posted by Udacity Mentors is available here:
 https://medium.com/@andresaaap/capstone-real-estate-marketplace-project-faq-udacity-blockchain-69fe13b4c14e
-
 
 # Project Resources
 
