@@ -11,11 +11,8 @@ contract SolnSquareVerifier is CustomERC721Token {
     Verifier _verifier;
     
     // TODO define a mapping to store unique solutions submitted
-    // Set the value to true when a solutions was tried and failed to verify
-    // Might seem counterintuitive, but I want to fail fast if we know this is wrong
-    // but I do NOT want to store the right answer
     mapping(bytes32 => bool) private _uniqueSolutions;
-    
+
     // TODO Create an event to emit when a solution is added
     event solutionAdded(bytes32 key);
     
@@ -51,34 +48,54 @@ contract SolnSquareVerifier is CustomERC721Token {
         // input
         uint[2] memory input) public onlyOwner returns(bool){
             // take a hash of the solution
-            bytes32 key = keccak256(abi.encodePacked(a,b,c));
+            bytes32 key = keccak256(abi.encodePacked(a,b,c,input));
 
             // check if this solution has been submitted already
-            // if the solution has been submitted and we know it's false fail fast
-            require(!_uniqueSolutions[key],'Failed proof');
-
-            // probablhy not necessary but making sure we assume it fails
-            bool valid = false;
+            require(!_uniqueSolutions[key],'Solution has already been used');
 
             // attempt to verify the transaction with the provided proof
-            valid = _verifier.verifyTx(
+            bool valid = _verifier.verifyTx(
                 [a[0],a[1]],
                 [[b[0][0],b[0][1]],[b[1][0],b[1][1]]],
                 [c[0],c[1]],
                 [input[0],input[1]]
             );
 
-            emit solutionAdded(key);
-
             // if it fails, record the failure so we can fail fast next time
-            if(!valid){
-                _uniqueSolutions[key] = true;
-            } else{
+            if(valid){
+                // add the solultion by it's key
+                addSolution(key);
                 // if it's successful call the mint function the parent to mint the coin
                 super.mint(to, tokenId);
             }
             // not sure if anyone will read this, but lets return
             // the result if we get here
             return valid;
+        }
+
+        /**
+        * Add a solution so that it can only be used once
+        * to verify a transaction (this should probably be internal).
+        */
+        function addSolution(bytes32 key) public onlyOwner {
+            _uniqueSolutions[key] = true;
+            emit solutionAdded(key);
+        }
+
+        /**
+        * Utility function that just checks if a failed solution has been
+        * tried already.  The contract will never store a successul
+        * solution as that should always be verified by the verifier and
+        * not stored locally in this contract instance.
+        */
+        function checkSolution(
+            // proof
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            // input
+            uint[2] memory input) public view onlyOwner returns(bool){
+                bytes32 key = keccak256(abi.encodePacked(a,b,c,input));
+                return _uniqueSolutions[key];
         }
 }

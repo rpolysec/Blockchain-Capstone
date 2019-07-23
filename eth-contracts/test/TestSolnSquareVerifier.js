@@ -18,43 +18,20 @@ contract('Solution Square Verifier Token Tests', accounts => {
     let input_1 = "0x0000000000000000000000000000000000000000000000000000000000000009";
     let input_2 = "0x0000000000000000000000000000000000000000000000000000000000000001";
 
-    describe('mint tokens with verifiers', function () {
+    describe('SolnSquareVerifier - mint tokens with verifiers', function () {
         beforeEach(async function () {
-            this.v = await verifier.new({from: account_one});
-            this.contract = await SolnSquareVerifier.new(v.address,'betatoken1','bt1',{from: account_one});
-            // TODO: mint multiple tokens
-            await this.contract.mint(account_one,101);
-        })
-
-        // Test if a new solution can be added for contract - SolnSquareVerifier
-        it('add a solution by attempting to mint a token', async function () { 
-            let result = true;
-            try 
-            {
-                result = await this.contract.verifiedMint(
-                    account_two,
-                    111,
-                    [proof_a2,proof_a1],
-                    [[proof_b11,proof_b12],[proof_b21,proof_b22]],
-                    [proof_c1,proof_c2],
-                    [input_1,input_2]
-                );
-            }
-            catch(e) {
-                console.log(e.message);
-            }
-            assert.equal(result, false, "minting failed with wrong proof");
+            this.verifier = await verifier.new({from: account_one});
+            this.contract = await SolnSquareVerifier.new(verifier.address,'betatoken1','bt1',{from: account_one});
         })
 
         // Test if an ERC721 token can be minted for contract - SolnSquareVerifier
-        it('mint a token', async function () { 
-            let result = false;
+        it('mint a token requiring a proof', async function () { 
             try 
             {
-                result = await this.contract.verifiedMint(
+                await this.contract.verifiedMint(
                     account_two,
                     111,
-                    [proof_a2,proof_a1],
+                    [proof_a1,proof_a2],
                     [[proof_b11,proof_b12],[proof_b21,proof_b22]],
                     [proof_c1,proof_c2],
                     [input_1,input_2]
@@ -63,7 +40,100 @@ contract('Solution Square Verifier Token Tests', accounts => {
             catch(e) {
                 console.log(e.message);
             }
-            assert.equal(result, true, "token minted with proper proof");
+            //assert.equal(result, true, "token should have minted with proper proof");
+            let owner = await this.contract.ownerOf(111);
+            assert.equal(owner,account_two,'Owner should now be account one');
+            let expectedURI = 'https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/111'
+            let actualURI = '';
+
+            try 
+            {
+                actualURI = await this.contract.tokenURI(111);
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+            assert.equal(expectedURI,actualURI,'returned token URI does not match the expected one');
+
+            try 
+            {
+                balance = await this.contract.balanceOf(account_two);
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+            assert.equal(balance, 1, "Account should have 1 token following verified mint");
         })
+
+        // Test that a new solutino was added for the contract - SolnSquareVerifier
+        it('check that the solution was added', async function () { 
+            let result = false;
+            try 
+            {
+                await this.contract.verifiedMint(
+                    account_two,
+                    222,
+                    [proof_a1,proof_a2],
+                    [[proof_b11,proof_b12],[proof_b21,proof_b22]],
+                    [proof_c1,proof_c2],
+                    [input_1,input_2]
+                );
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+
+            try 
+            {
+                result = await this.contract.checkSolution.call(
+                    [proof_a1,proof_a2],
+                    [[proof_b11,proof_b12],[proof_b21,proof_b22]],
+                    [proof_c1,proof_c2],
+                    [input_1,input_2]
+                );
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+            assert.equal(result, true, "solution should have already existed");
+        });
+
+        // Tryig to mint again with the same proof should fail - SolnSquareVerifier
+        it('try to mint a token with a duplicate solution', async function () { 
+            try 
+            {
+                await this.contract.verifiedMint(
+                    account_two,
+                    111,
+                    [proof_a1,proof_a2],
+                    [[proof_b11,proof_b12],[proof_b21,proof_b22]],
+                    [proof_c1,proof_c2],
+                    [input_1,input_2]
+                );
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+
+            let mintAgain = true;
+
+            try 
+            {
+                await this.contract.verifiedMint(
+                    account_two,
+                    111,
+                    [proof_a1,proof_a2],
+                    [[proof_b11,proof_b12],[proof_b21,proof_b22]],
+                    [proof_c1,proof_c2],
+                    [input_1,input_2]
+                );
+            }
+            catch(e) {
+                //console.log(e.message);
+                mintAgain = false;
+            }
+            assert.equal(mintAgain, false, "token should have minted with proper proof");
+        });
+
     });
 });

@@ -18,7 +18,7 @@ contract('Verifier', function(accounts) {
     const account_one = accounts[0];
     const account_two = accounts[1];
 
-    describe('match erc721 spec', function () {
+    describe('Verifier - test verifyTx fail and pass', function () {
         beforeEach(async function () { 
             this.contract = await verifier.new({from: account_one});
         })
@@ -57,7 +57,7 @@ contract('Verifier', function(accounts) {
             }
             catch(e)
             {
-                console.log(e.message);
+                //console.log(e.message);
                 result = false;
             }
             assert.equal(result,false,'verifyTx should return false');
