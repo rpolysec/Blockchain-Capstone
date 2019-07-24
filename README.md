@@ -25,6 +25,8 @@ https://rinkeby.opensea.io/storefront/sunrise-housing-udacity-capstone
 Contract Owner: 0x128fA10168790263921668a45E0f00e00361A533
 Second Address: 0xDCf0a8aD36E9b40025A69A6B409f8ef67d5aF364
 
+Note: My tokens can be tranferred to another owner, but otherwise seem to be locked and I can't get them onto the marketplace.  Instead I get error about running out of gas.  However, I was able to post the tokens for sale and 'gift' them.
+
 # Install
 
 Clone this repository and run the following commands:
