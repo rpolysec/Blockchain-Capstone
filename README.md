@@ -4,12 +4,26 @@ The capstone will build upon the knowledge you have gained in the course in orde
 
 # Handin Details
 
-Contract Addresses
+## Contracts
+Contract: SolnSquareVerifier
+Address: 0x2F6795051DA5f79eF4451D4A6526D6DFC3AFCb82
+Name: betatoken1
+Symbol: bt1
 
-Contract Abi's
+Contract: Verifier
+Address: 0x3Aa4CaD32f4f8245d9Ee410AAcBEd1111A3c81B0
+
+Contract: CustomERC721Token
+Address: 0xe204F802d34CF7BC3c670a73DA80CC7095D0Bd83
+
+## OpenSea
 
 OpenSea MarketPlace Storefront links:
+https://rinkeby.opensea.io/category/betatoken1
 https://rinkeby.opensea.io/storefront/sunrise-housing-udacity-capstone
+
+Contract Owner: 0x128fA10168790263921668a45E0f00e00361A533
+Second Address: 0xDCf0a8aD36E9b40025A69A6B409f8ef67d5aF364
 
 # Install
 
